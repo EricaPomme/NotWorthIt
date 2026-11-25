@@ -120,6 +120,11 @@ end
 local POOR_QUALITY = Enum and Enum.ItemQuality and Enum.ItemQuality.Poor or 0
 local CONSUMABLE_CLASS = Enum and Enum.ItemClass and Enum.ItemClass.Consumable or 0
 
+-- Whole percent used by the flagged line's reason text (1.02 -> 2). Display
+-- only and rounded; the verdict itself always compares against the
+-- unrounded vendor bar.
+local thresholdPercent = math.floor((NWC_THRESHOLD - 1) * 100 + 0.5)
+
 -- Green signature line shown when the auction house wins: the addon's own
 -- name, with its "Not" struck out by a hand-positioned texture, so the
 -- line reads "WorthIt". (Blizzard's text rendering has no native
@@ -411,12 +416,17 @@ local function GetVerdict(itemID, itemLink, bagID, slotID, dbg)
 
   local depositPerUnit = GetDepositPerUnit(itemID, itemLink, bagID, slotID)
   local net = price * (1 - NWC_AUCTION_CUT) - depositPerUnit
+  -- The hurdle the auction net must clear: the vendor price raised by the
+  -- threshold factor. The flagged tooltip line reports the threshold as a
+  -- percent instead of this number; the debug lines use it directly.
+  local vendorBar = sellPrice * NWC_THRESHOLD
 
   return {
-    notWorthIt = net < sellPrice * NWC_THRESHOLD,
+    notWorthIt = net < vendorBar,
     stale = false,
     adjusted = adjusted,
     vendor = sellPrice,
+    vendorBar = vendorBar,
     net = net,
     price = price,
     deposit = depositPerUnit,
@@ -567,7 +577,7 @@ local function OnItemTooltip(tooltip)
   if not verdict.notWorthIt then
     if dbg then
       dbg(string.format("AH wins: net %s >= vendor bar %s",
-        MoneyString(verdict.net), MoneyString(verdict.vendor * NWC_THRESHOLD)))
+        MoneyString(verdict.net), MoneyString(verdict.vendorBar)))
     end
 
     -- Green signature line: the addon's own name with its "Not" struck
@@ -595,14 +605,20 @@ local function OnItemTooltip(tooltip)
 
   if dbg then
     dbg(string.format("FLAGGED: net %s < vendor bar %s",
-      MoneyString(verdict.net), MoneyString(verdict.vendor * NWC_THRESHOLD)))
+      MoneyString(verdict.net), MoneyString(verdict.vendorBar)))
   end
 
   tooltip.__NWCLine = true
   EnsureClearHook(tooltip)
+  -- Reason text: what the auction net fell under. The verb keeps the net
+  -- from being misread as the shortfall. A threshold of exactly 1.0 is the
+  -- plain vendor comparison, so it reads differently.
+  local reasonTail = thresholdPercent > 0
+    and thresholdPercent .. "% threshold"
+    or "vendor price"
   tooltip:AddDoubleLine(
     "NotWorthIt - vendor pays more",
-    "vendor " .. MoneyString(verdict.vendor) .. " > AH " .. MoneyString(verdict.net)
+    "AH " .. MoneyString(verdict.net) .. " is under " .. reasonTail
       .. (verdict.adjusted and " (outlier ignored)" or ""),
     1, 0.3, 0.25,
     1, 1, 1

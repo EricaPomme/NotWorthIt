@@ -2,7 +2,17 @@
 
 ## Table of Contents
 
+- [Version 1.0.1](#version-101---2026-11-25)
 - [Version 1.0.0](#version-100---2026-11-25)
+
+## Version 1.0.1 - 2026-11-25
+
+### Fixed - 1.0.1
+
+- The red verdict line states its reason instead of a bare inequality: the
+  auction net and the `NWC_THRESHOLD` percent it fell under, for example
+  `AH 6s11c is under 2% threshold`, so near-threshold items no longer display
+  false inequalities such as `vendor 6s > AH 6s11c`.
 
 ## Version 1.0.0 - 2026-11-25
 

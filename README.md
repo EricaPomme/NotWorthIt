@@ -24,13 +24,15 @@ judges items, edit the tunables at the top of `NotWorthIt.lua` and reload.
 - When the vendor wins, the item tooltip gains a red line:
 
 ```text
-NotWorthIt - vendor pays more        vendor 1g23s > AH 97s
+NotWorthIt - vendor pays more        AH 97s is under 2% threshold
 ```
 
 ![NotWorthIt's red "NotWorthIt - vendor pays more" verdict line on a Sharp Claw tooltip, with the vendor-versus-auction net comparison on the right, alongside ATT item details and Dejunk's sections, with Baganator's sorted bag view behind and the offending stack circled in green](doc/not-worth-it.png)
 
 *Not worth it: Sharp Claw vendors for more than its auction net after the
-house cut and deposit, so the red line appears.*
+house cut and deposit, so the red line appears. The reason on the right
+gives the auction net and the threshold (2% by default) that it fell
+under.*
 
 - When the auction wins instead, the tooltip gains a green signature line -
   the addon's own name, with "Not" struck out in red and "WorthIt" in green,
