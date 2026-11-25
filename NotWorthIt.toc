@@ -1,0 +1,9 @@
+## Interface: 16001
+## Title: NotWorthIt
+## Notes: Flags items worth more to a vendor than on the auction house.
+## Author: EricaPomme
+## Version: 1.0.0
+## Category-enUS: Auctions
+## OptionalDeps: Auctionator, Baganator, Dejunk
+
+NotWorthIt.lua
