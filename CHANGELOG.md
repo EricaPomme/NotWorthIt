@@ -2,8 +2,19 @@
 
 ## Table of Contents
 
+- [Recent Changes](#recent-changes)
 - [Version 1.0.1](#version-101---2026-11-25)
 - [Version 1.0.0](#version-100---2026-11-25)
+
+## Recent Changes
+
+### Changed
+
+- Both verdict lines share one shape: the addon's name on the left and the
+  winning margin on the right - `<amount> more on AH` when auctioning wins,
+  `<amount> more at vendor` when vendoring wins. The flagged line's figure
+  is the shortfall against the vendor's threshold bar, so it stays correct
+  even when the raw vendor price sits below the auction net.
 
 ## Version 1.0.1 - 2026-11-25
 

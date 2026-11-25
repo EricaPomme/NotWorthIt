@@ -120,11 +120,6 @@ end
 local POOR_QUALITY = Enum and Enum.ItemQuality and Enum.ItemQuality.Poor or 0
 local CONSUMABLE_CLASS = Enum and Enum.ItemClass and Enum.ItemClass.Consumable or 0
 
--- Whole percent used by the flagged line's reason text (1.02 -> 2). Display
--- only and rounded; the verdict itself always compares against the
--- unrounded vendor bar.
-local thresholdPercent = math.floor((NWC_THRESHOLD - 1) * 100 + 0.5)
-
 -- Green signature line shown when the auction house wins: the addon's own
 -- name, with its "Not" struck out by a hand-positioned texture, so the
 -- line reads "WorthIt". (Blizzard's text rendering has no native
@@ -610,15 +605,14 @@ local function OnItemTooltip(tooltip)
 
   tooltip.__NWCLine = true
   EnsureClearHook(tooltip)
-  -- Reason text: what the auction net fell under. The verb keeps the net
-  -- from being misread as the shortfall. A threshold of exactly 1.0 is the
-  -- plain vendor comparison, so it reads differently.
-  local reasonTail = thresholdPercent > 0
-    and thresholdPercent .. "% threshold"
-    or "vendor price"
+  -- Both verdict lines share one shape: the addon's name on the left, the
+  -- winning margin on the right. On this line the figure is the shortfall
+  -- against the vendor bar (vendor price times NWC_THRESHOLD) - the margin
+  -- the verdict acted on - which stays positive even when the raw vendor
+  -- price sits below the auction net.
   tooltip:AddDoubleLine(
-    "NotWorthIt - vendor pays more",
-    "AH " .. MoneyString(verdict.net) .. " is under " .. reasonTail
+    "NotWorthIt",
+    MoneyString(verdict.vendorBar - verdict.net) .. " more at vendor"
       .. (verdict.adjusted and " (outlier ignored)" or ""),
     1, 0.3, 0.25,
     1, 1, 1

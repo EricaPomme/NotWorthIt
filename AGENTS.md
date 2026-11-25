@@ -19,8 +19,11 @@ at the top of `NotWorthIt.lua`; the user edits their own working copy (for
 example flipping `NWC_DEBUG`), so never revert or "clean up" their local
 edits unasked.
 
-- The tooltip verdict answers "what is the best way to sell this" and always
-  reports the plain vendor-versus-auction comparison.
+- The tooltip verdict answers "what is the best way to sell this": both
+  verdict lines show the addon's name on the left and the winning margin on
+  the right (`more on AH` / `more at vendor`). The flagged line's margin is
+  the shortfall against the vendor bar (vendor price times the threshold),
+  which is what the verdict acts on.
 - The Baganator junk label answers "is this trash": the guards (greys, useful
   items, equipment sets) shape only the label, never the tooltip verdict.
 - Dejunk is delegated to via its public `DejunkApi:IsJunk`, never
