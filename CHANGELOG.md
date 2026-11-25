@@ -2,20 +2,20 @@
 
 ## Table of Contents
 
-- [Recent Changes](#recent-changes)
+- [Version 1.1.0](#version-110---2026-11-25)
 - [Version 1.0.1](#version-101---2026-11-25)
 - [Version 1.0.0](#version-100---2026-11-25)
 
-## Recent Changes
+## Version 1.1.0 - 2026-11-25
 
-### Added
+### Added - 1.1.0
 
 - Holding Shift while hovering adds a calculation line under either verdict
   line - the auction net, the margin figure the verdict line shows, the
   vendor price, and the threshold-adjusted vendor bar in parentheses - and
   the tooltip updates while Shift is pressed or released.
 
-### Changed
+### Changed - 1.1.0
 
 - Both verdict lines share one shape: the addon's name on the left and the
   winning margin on the right - `<amount> more on AH` when auctioning wins,

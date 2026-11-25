@@ -2,7 +2,7 @@
 ## Title: NotWorthIt
 ## Notes: Flags items worth more to a vendor than on the auction house.
 ## Author: EricaPomme
-## Version: 1.0.1
+## Version: 1.1.0
 ## Category-enUS: Auctions
 ## OptionalDeps: Auctionator, Baganator, Dejunk
 
