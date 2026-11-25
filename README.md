@@ -26,15 +26,16 @@ judges items, edit the tunables at the top of `NotWorthIt.lua` and reload.
   bar (the vendor price raised by `NWC_THRESHOLD`):
 
 ```text
-NotWorthIt        4s20c more at vendor
+NotWorthIt        14c more at vendor
+AH 33c is 14c below vendor 45c at 2% threshold (46c).
 ```
 
-![NotWorthIt's red "NotWorthIt" verdict line on a Sharp Claw tooltip, with the amount the vendor route leads by on the right, alongside ATT item details and Dejunk's sections, with Baganator's sorted bag view behind and the offending stack circled in green](doc/not-worth-it.png)
+![NotWorthIt's red "NotWorthIt" verdict line on a Sharp Claw tooltip, with the vendor's lead on the right and, while Shift is held, the grey calculation line below it, alongside ATT item details and Dejunk's sections, with Baganator's bag view behind and the offending stack circled in green](doc/not-worth-it.png)
 
-*Not worth it: Sharp Claw vendors for more than its auction net after the
-house cut and deposit, so the red line appears. The figure on the right is
-the shortfall against the vendor's threshold bar (2% above the vendor price
-by default).*
+*Not worth it: Sharp Claw's auction net, after the house cut and deposit,
+falls short of the vendor's threshold bar, so the red line appears. With
+Shift held, the calculation line spells it out: the 45c vendor price
+becomes a 46c bar under the 2% threshold, and the net lands 14c below it.*
 
 - When the auction wins instead, the tooltip gains a green signature line -
   the addon's own name, with "Not" struck out in red and "WorthIt" in green,
@@ -42,26 +43,24 @@ by default).*
   the vendor:
 
 ```text
-~~Not~~WorthIt        47s more on AH
+~~Not~~WorthIt        37c more on AH
+AH 62c is 37c above vendor 25c at 2% threshold (26c).
 ```
 
-![NotWorthIt's green "~~Not~~WorthIt" signature line on a Stringy Wolf Meat tooltip, with the amount the auction nets above vendoring on the right, alongside ATT item details and Dejunk's sections, with Baganator's sorted bag view behind](doc/worth-it.png)
+![NotWorthIt's green "~~Not~~WorthIt" signature line on a Tender Crocolisk Meat tooltip, with the auction's lead on the right and, while Shift is held, the grey calculation line below it, alongside ATT item details and Dejunk's sections, with the item's bag slot circled in green](doc/worth-it.png)
 
-*Worth it: Stringy Wolf Meat nets more on the auction house than at the
+*Worth it: Tender Crocolisk Meat nets more on the auction house than at the
 vendor, so the green signature line appears - the addon's own name with its
-"Not" struck out.*
+"Not" struck out. With Shift held, the calculation line shows the numbers:
+62c net after the house cut and deposit, 37c above the 25c vendor price.*
 
-- Holding Shift while hovering adds a calculation line under either verdict
-  line, spelling out the numbers the verdict used - the auction net, the
-  same margin figure the verdict line shows, the vendor price, and the
-  vendor bar that price becomes under the threshold (`NWC_THRESHOLD`) in
-  parentheses. The tooltip updates the moment Shift is pressed or
-  released; holding Shift before hovering works too.
-
-```text
-~~Not~~WorthIt        47s more on AH
-AH 92s is 47s above vendor 45s at 2% threshold (45s90c).
-```
+- Holding Shift while hovering adds the grey calculation line under either
+  verdict line - both screenshots above show it - spelling out the numbers
+  the verdict used: the auction net, the same margin figure the verdict
+  line shows, the vendor price, and the vendor bar that price becomes under
+  the threshold (`NWC_THRESHOLD`) in parentheses. The tooltip updates the
+  moment Shift is pressed or released; holding Shift before hovering works
+  too.
 
 - With Baganator installed, the same verdict feeds its junk plugin system, so
   flagged items show the junk coin and sort with the trash. Baganator runs
