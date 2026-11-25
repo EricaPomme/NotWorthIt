@@ -51,6 +51,18 @@ by default).*
 vendor, so the green signature line appears - the addon's own name with its
 "Not" struck out.*
 
+- Holding Shift while hovering adds a calculation line under either verdict
+  line, spelling out the numbers the verdict used - the auction net, the
+  same margin figure the verdict line shows, the vendor price, and the
+  vendor bar that price becomes under the threshold (`NWC_THRESHOLD`) in
+  parentheses. The tooltip updates the moment Shift is pressed or
+  released; holding Shift before hovering works too.
+
+```text
+~~Not~~WorthIt        47s more on AH
+AH 92s is 47s above vendor 45s at 2% threshold (45s90c).
+```
+
 - With Baganator installed, the same verdict feeds its junk plugin system, so
   flagged items show the junk coin and sort with the trash. Baganator runs
   only one junk detector at a time, so NotWorthIt also covers the standard

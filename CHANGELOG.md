@@ -8,6 +8,13 @@
 
 ## Recent Changes
 
+### Added
+
+- Holding Shift while hovering adds a calculation line under either verdict
+  line - the auction net, the margin figure the verdict line shows, the
+  vendor price, and the threshold-adjusted vendor bar in parentheses - and
+  the tooltip updates while Shift is pressed or released.
+
 ### Changed
 
 - Both verdict lines share one shape: the addon's name on the left and the

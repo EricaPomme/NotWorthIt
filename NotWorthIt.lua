@@ -12,7 +12,8 @@
 --
 -- When a fresh auction price exists and the auction net lands below the
 -- vendor bar, the item tooltip says so, and Baganator (if installed) can
--- flag the item as junk so it sorts with the trash.
+-- flag the item as junk so it sorts with the trash. Holding Shift while
+-- hovering spells out the calculation under the verdict line.
 ------------------------------------------------------------------------------
 
 local ADDON_NAME = "NotWorthIt"
@@ -102,6 +103,11 @@ if depositRate == nil or durationIndex == nil then
   depositRate = DEPOSIT_RATES[8]
   durationIndex = DURATION_INDEXES[8]
 end
+
+-- Whole-percent form of NWC_THRESHOLD for the Shift-held calculation line
+-- (1.02 -> 2). Display only and rounded; the verdict always compares
+-- against the unrounded vendor bar.
+local thresholdPercent = math.floor((NWC_THRESHOLD - 1) * 100 + 0.5)
 
 -- Bind types that may still be listed on the auction house. Everything
 -- else (soulbound, quest items, ...) has no auction value to compare.
@@ -412,8 +418,8 @@ local function GetVerdict(itemID, itemLink, bagID, slotID, dbg)
   local depositPerUnit = GetDepositPerUnit(itemID, itemLink, bagID, slotID)
   local net = price * (1 - NWC_AUCTION_CUT) - depositPerUnit
   -- The hurdle the auction net must clear: the vendor price raised by the
-  -- threshold factor. The flagged tooltip line reports the threshold as a
-  -- percent instead of this number; the debug lines use it directly.
+  -- threshold factor. The Shift-held calculation line spells this
+  -- comparison out; the debug lines use the numbers directly.
   local vendorBar = sellPrice * NWC_THRESHOLD
 
   return {
@@ -515,6 +521,28 @@ local function AddStrikeBar(tooltip, lineFS)
   bar:Show()
 end
 
+-- The calculation behind the verdict, added under the verdict line while
+-- Shift is held: the auction net, the same margin figure the verdict line
+-- above shows, the vendor price it is measured against, and in
+-- parentheses the vendor bar that price becomes under the threshold -
+-- the hurdle the flagged line fell short of.
+local function AddCalculationLine(tooltip, verdict)
+  if not IsShiftKeyDown() then
+    return
+  end
+  local gap = verdict.notWorthIt
+    and verdict.vendorBar - verdict.net
+    or verdict.net - verdict.vendor
+  tooltip:AddLine(string.format(
+    "AH %s is %s %s vendor %s at %d%% threshold (%s).",
+    MoneyString(verdict.net),
+    MoneyString(gap),
+    verdict.notWorthIt and "below" or "above",
+    MoneyString(verdict.vendor),
+    thresholdPercent,
+    MoneyString(verdict.vendorBar)), 0.75, 0.75, 0.75)
+end
+
 local function OnItemTooltip(tooltip)
   if tooltip.__NWCLine or tooltip:IsForbidden() then
     return
@@ -588,10 +616,15 @@ local function OnItemTooltip(tooltip)
       1, 1, 1
     )
 
-    -- The strike bar is cosmetic; skip it silently if anything is off.
+    -- The strike bar targets this line's font string, so it is captured
+    -- before the calculation line, if any, is added below.
     local tooltipName = tooltip:GetName()
     local lineFS = tooltipName
       and _G[tooltipName .. "TextLeft" .. tooltip:NumLines()]
+
+    AddCalculationLine(tooltip, verdict)
+
+    -- The strike bar is cosmetic; skip it silently if anything is off.
     if lineFS ~= nil then
       AddStrikeBar(tooltip, lineFS)
     end
@@ -617,6 +650,7 @@ local function OnItemTooltip(tooltip)
     1, 0.3, 0.25,
     1, 1, 1
   )
+  AddCalculationLine(tooltip, verdict)
 end
 
 local function RegisterTooltipProcessing()
@@ -773,10 +807,24 @@ if Auctionator and Auctionator.API and Auctionator.API.v1
   end)
 end
 
+-- Re-render an open tooltip when Shift is pressed or released, so the
+-- calculation line appears and disappears without re-hovering.
+-- RefreshData sends the tooltip back through the data pipeline, which
+-- re-fires the item post-call hook above; the guards keep it silent when
+-- the tooltip is not ours or the build lacks the method, and holding
+-- Shift before hovering always works.
+local function RefreshShiftTooltip(tooltip)
+  if tooltip ~= nil and tooltip.__NWCLine
+      and tooltip:IsVisible() and tooltip.RefreshData ~= nil then
+    pcall(tooltip.RefreshData, tooltip)
+  end
+end
+
 local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("ADDON_LOADED")
 eventFrame:RegisterEvent("AUCTION_HOUSE_SHOW")
 eventFrame:RegisterEvent("AUCTION_HOUSE_CLOSED")
+eventFrame:RegisterEvent("MODIFIER_STATE_CHANGED")
 eventFrame:SetScript("OnEvent", function(_, event, arg1)
   if event == "ADDON_LOADED" then
     -- Auctionator, Baganator and Dejunk are listed in OptionalDeps and
@@ -794,5 +842,11 @@ eventFrame:SetScript("OnEvent", function(_, event, arg1)
     ahOpen = true
   elseif event == "AUCTION_HOUSE_CLOSED" then
     ahOpen = false
+  elseif event == "MODIFIER_STATE_CHANGED" then
+    -- Only Shift matters; other modifiers leave the tooltip unchanged.
+    if arg1 == "LSHIFT" or arg1 == "RSHIFT" then
+      RefreshShiftTooltip(GameTooltip)
+      RefreshShiftTooltip(ItemRefTooltip)
+    end
   end
 end)

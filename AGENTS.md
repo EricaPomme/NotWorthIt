@@ -24,6 +24,12 @@ edits unasked.
   the right (`more on AH` / `more at vendor`). The flagged line's margin is
   the shortfall against the vendor bar (vendor price times the threshold),
   which is what the verdict acts on.
+- Holding Shift adds a calculation line under either verdict line: the
+  auction net, the same margin figure the verdict line shows, the vendor
+  price, and the vendor bar (vendor price times the threshold) in
+  parentheses. It renders when the tooltip is built and re-renders live on
+  Shift changes via `RefreshData` (guarded, silent when the build lacks
+  it).
 - The Baganator junk label answers "is this trash": the guards (greys, useful
   items, equipment sets) shape only the label, never the tooltip verdict.
 - Dejunk is delegated to via its public `DejunkApi:IsJunk`, never
