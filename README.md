@@ -15,6 +15,7 @@ judges items, edit the tunables at the top of `NotWorthIt.lua` and reload.
 - [Integrations](#integrations)
 - [Notes and limits](#notes-and-limits)
 - [Roadmap](#roadmap)
+- [Packaging](#packaging)
 - [AI Advisory / Warranty](#ai-advisory--warranty)
 
 ## What it does
@@ -214,6 +215,28 @@ houses charge more, and the exact path handles those automatically.
   expected work is small: a multi-version `## Interface` line, plus
   recalibrating the deposit and auction-duration tunables, which currently
   encode Forever's auction rules and are untested on retail.
+
+## Packaging
+
+`pack.ps1` (Windows) and `pack.sh` (macOS/Linux) build the distribution
+archive from whatever version `NotWorthIt.toc` currently declares:
+
+```text
+.\pack.ps1             -> dist\NotWorthIt-<version>.zip
+.\pack.ps1 -WhatIf     -> dry run: prints the plan, writes nothing
+.\pack.ps1 -OutputPath <dir>
+./pack.sh              -> dist/NotWorthIt-<version>.tar.gz
+./pack.sh -o <dir>     -> override the output directory
+```
+
+The archive root is a single `NotWorthIt/` folder holding `NotWorthIt.lua`,
+`NotWorthIt.toc`, `README.md` and `CHANGELOG.md` - the layout CurseForge and
+GitHub releases expect. Recipients can upload or attach the archive as-is,
+or extract it straight into `Interface\AddOns\` for an instant install.
+
+The scripts stage into a temp directory and package only the items above -
+repo tooling, including the scripts themselves, never ends up in the
+archive. `dist/` is git-ignored.
 
 ## AI Advisory / Warranty
 
