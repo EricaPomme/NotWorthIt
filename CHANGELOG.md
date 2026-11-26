@@ -2,20 +2,21 @@
 
 ## Table of Contents
 
+- [Version 1.3.0](#version-130---2026-11-26)
 - [Version 1.2.0](#version-120---2026-11-26)
 - [Version 1.1.0](#version-110---2026-11-25)
 - [Version 1.0.1](#version-101---2026-11-25)
 - [Version 1.0.0](#version-100---2026-11-25)
 
-## Recent Changes
+## Version 1.3.0 - 2026-11-26
 
-### Added
+### Added - 1.3.0
 
 - Addon logo: `doc/logo-vector.svg` is the vector source - copper coin,
   question mark, and verdict glyphs on exact 45/225-degree diagonals - and
   `doc/logo.png` a 1024px transparent render of it for the README.
 
-### Fixed
+### Fixed - 1.3.0
 
 - `NWC_BANK_ALT_MODE` and `NWC_DEBUG` ship off by default: the Bank Alt
   mode commit accidentally included testing values with both enabled, so
