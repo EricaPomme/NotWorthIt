@@ -2,13 +2,14 @@
 
 ## Table of Contents
 
+- [Version 1.2.0](#version-120---2026-11-26)
 - [Version 1.1.0](#version-110---2026-11-25)
 - [Version 1.0.1](#version-101---2026-11-25)
 - [Version 1.0.0](#version-100---2026-11-25)
 
-## Recent Changes
+## Version 1.2.0 - 2026-11-26
 
-### Added
+### Added - 1.2.0
 
 - Bank Alt mode: with the new `NWC_BANK_ALT_MODE` tunable, the auction net
   also pays the 30c-per-stack fee of mailing loot to a bank alt before
