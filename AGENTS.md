@@ -73,8 +73,8 @@ an API exists and behaves as expected before relying on it.
 
 ## Environment notes
 
-- Forever (1.60.1) is a vanilla-flavoured private server built on the modern
-  retail engine: Interface 16001, game type `camelot` (`WOW_PROJECT_ID` equals
+- Forever (1.60.1) is a vanilla-flavoured server built on the modern retail
+  engine: Interface 16001, game type `camelot` (`WOW_PROJECT_ID` equals
   `WOW_PROJECT_CAMELOT`), classic-style auction house with modern APIs.
 - Retail (12.x) support is planned but not implemented (see the README
   Roadmap). Do not implement it unasked.
