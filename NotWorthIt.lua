@@ -62,7 +62,7 @@ local NWC_SCAM_RATIO = 0.5
 -- the auction net also pays a per-unit share of that fee: the item's total
 -- quantity in your bags, restacked into full stacks, times the fee, spread
 -- across those units. Disable with false.
-local NWC_BANK_ALT_MODE = true
+local NWC_BANK_ALT_MODE = false
 
 -- The per-stack mail fee charged by NWC_BANK_ALT_MODE, in copper.
 local NWC_MAIL_COST_PER_STACK = 30
@@ -97,7 +97,7 @@ local NWC_JUNK_USE_DEJUNK = true
 
 -- Print one chat line per hovered item explaining its verdict. Off by
 -- default; flip to true while tuning or diagnosing.
-local NWC_DEBUG = true
+local NWC_DEBUG = false
 
 --------------------------------------------------------------------------
 -- Derived constants

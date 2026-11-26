@@ -7,6 +7,15 @@
 - [Version 1.0.1](#version-101---2026-11-25)
 - [Version 1.0.0](#version-100---2026-11-25)
 
+## Recent Changes
+
+### Fixed
+
+- `NWC_BANK_ALT_MODE` and `NWC_DEBUG` ship off by default: the Bank Alt
+  mode commit accidentally included testing values with both enabled, so
+  a fresh install charged the mail fee and printed a debug line per
+  hovered item out of the box.
+
 ## Version 1.2.0 - 2026-11-26
 
 ### Added - 1.2.0
