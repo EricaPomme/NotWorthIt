@@ -9,6 +9,12 @@
 
 ## Recent Changes
 
+### Added
+
+- Addon logo: `doc/logo-vector.svg` is the vector source - copper coin,
+  question mark, and verdict glyphs on exact 45/225-degree diagonals - and
+  `doc/logo.png` a 1024px transparent render of it for the README.
+
 ### Fixed
 
 - `NWC_BANK_ALT_MODE` and `NWC_DEBUG` ship off by default: the Bank Alt
