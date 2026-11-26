@@ -9,7 +9,8 @@ lives in README.md; do not duplicate it here.
   constants, verdict logic, tooltip rendering, Baganator integration.
 - `NotWorthIt.toc` - Forever manifest (Interface 16001).
 - `README.md` - user-facing docs (functionality, tunables, integrations).
-- `doc/` - README screenshots.
+- `doc/` - README screenshots and `doc/curseforge-description.md`, the
+  CurseForge listing (markdown, paste-ready; convert to BBCode first).
 
 ## Design invariants
 
@@ -80,3 +81,6 @@ an API exists and behaves as expected before relying on it.
 - Retail (12.x) support is planned but not implemented (see the README
   Roadmap). Do not implement it unasked.
 - Keep README.md in sync with behaviour changes, and keep it lightweight.
+- Keep `doc/curseforge-description.md` in sync with README changes: it is
+  the CurseForge listing, so whenever a README change affects functionality,
+  tunables, or integrations, apply the same change there.
