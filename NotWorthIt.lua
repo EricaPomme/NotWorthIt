@@ -375,8 +375,8 @@ end
 -- flat total, and the unit count it was spread across - zeros when the
 -- mode is off or the item is not in the bags (nothing to mail). The stack
 -- size comes from the client's item data, floored by the largest stack
--- observed in the bags: on a private server the client's data can lag the
--- server's (a slot can visibly hold more than GetItemInfo reports), and a
+-- observed in the bags: the client's data can lag the server's packing
+-- (a slot can visibly hold more than GetItemInfo reports), and a
 -- server-packed slot is the server's true stack size. When neither source
 -- says anything usable, fall back to one stack per unit - the conservative
 -- maximum - which also keeps the division below safe.

@@ -1,7 +1,8 @@
 # NotWorthIt
 
-A passive addon for World of Warcraft: Forever (1.60.1) that tells you when an
-item is worth more to a vendor than on the auction house.
+A passive addon for World of Warcraft: Forever (1.60.1) - Blizzard's official
+vanilla-flavoured server, launched November 2026 - that tells you when an item
+is worth more to a vendor than on the auction house.
 
 No settings UI, no slash commands. Install it and it works. To change how it
 judges items, edit the tunables at the top of `NotWorthIt.lua` and reload.
@@ -96,8 +97,8 @@ stack, which eats into small profits fast at low levels. With
 that fee: the item's total quantity in your bags, restacked into full
 stacks, times the fee, spread across those units. The stack size comes from
 the game's item data, floored by the largest stack actually observed in
-your bags - a private server's item data can lag its own packing, and a
-visibly fuller slot wins. So 34 Light Leather (stacks of 20) is 2 stacks of
+your bags - the client's data can lag the server's packing, and a visibly
+fuller slot wins. So 34 Light Leather (stacks of 20) is 2 stacks of
 postage - 60c, roughly 2c per unit off the net. Items you hold none of pay
 nothing, and non-stackables like BoE greens count as one stack each: 30c of
 postage per item. The fee shapes the verdict and the Baganator junk flags
