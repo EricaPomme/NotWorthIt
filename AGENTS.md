@@ -10,7 +10,8 @@ lives in README.md; do not duplicate it here.
 - `NotWorthIt.toc` - Forever manifest (Interface 16001).
 - `README.md` - user-facing docs (functionality, tunables, integrations).
 - `doc/` - README screenshots and `doc/curseforge-description.md`, the
-  CurseForge listing (markdown, paste-ready; convert to BBCode first).
+  CurseForge listing (markdown, paste-ready as-is; CurseForge projects can
+  use markdown descriptions).
 
 ## Design invariants
 
@@ -83,4 +84,7 @@ an API exists and behaves as expected before relying on it.
 - Keep README.md in sync with behaviour changes, and keep it lightweight.
 - Keep `doc/curseforge-description.md` in sync with README changes: it is
   the CurseForge listing, so whenever a README change affects functionality,
-  tunables, or integrations, apply the same change there.
+  tunables, or integrations, apply the same change there. That file is
+  exempt from the 80-column markdown wrapping: keep each paragraph and list
+  item on a single long line, because mid-line breaks cause formatting
+  problems when the description is pasted into CurseForge.
