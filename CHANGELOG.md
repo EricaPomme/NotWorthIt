@@ -6,6 +6,20 @@
 - [Version 1.0.1](#version-101---2026-11-25)
 - [Version 1.0.0](#version-100---2026-11-25)
 
+## Recent Changes
+
+### Added
+
+- Bank Alt mode: with the new `NWC_BANK_ALT_MODE` tunable, the auction net
+  also pays the 30c-per-stack fee of mailing loot to a bank alt before
+  auctioning. The fee comes from the item's total quantity in your bags,
+  restacked into full stacks, and is spread across those units
+  (`NWC_MAIL_COST_PER_STACK` sets the rate); the Shift-held calculation
+  line discloses the per-unit share with the flat stash total. Stack size
+  is read from the game's item data, floored by the largest stack actually
+  observed in your bags, so mismatched private-server item data no longer
+  overcounts the stacks.
+
 ## Version 1.1.0 - 2026-11-25
 
 ### Added - 1.1.0

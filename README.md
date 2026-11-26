@@ -58,9 +58,10 @@ vendor, so the green signature line appears - the addon's own name with its
   verdict line - both screenshots above show it - spelling out the numbers
   the verdict used: the auction net, the same margin figure the verdict
   line shows, the vendor price, and the vendor bar that price becomes under
-  the threshold (`NWC_THRESHOLD`) in parentheses. The tooltip updates the
-  moment Shift is pressed or released; holding Shift before hovering works
-  too.
+  the threshold (`NWC_THRESHOLD`) in parentheses, plus an `incl. <fee>
+  mail (<total> across <count>)` note when bank alt mode charged a mailing
+  fee to the net. The tooltip updates the moment Shift is pressed or
+  released; holding Shift before hovering works too.
 
 - With Baganator installed, the same verdict feeds its junk plugin system, so
   flagged items show the junk coin and sort with the trash. Baganator runs
@@ -88,6 +89,20 @@ vendor wins when: auction net < vendor bar
 The default threshold of 1.02 means the auction has to beat the vendor by at
 least 2% before the item is considered worth listing.
 
+**Bank alt mode.** Mailing loot to a bank alt to auction costs 30c per item
+stack, which eats into small profits fast at low levels. With
+`NWC_BANK_ALT_MODE` enabled, the auction net also pays a per-unit share of
+that fee: the item's total quantity in your bags, restacked into full
+stacks, times the fee, spread across those units. The stack size comes from
+the game's item data, floored by the largest stack actually observed in
+your bags - a private server's item data can lag its own packing, and a
+visibly fuller slot wins. So 34 Light Leather (stacks of 20) is 2 stacks of
+postage - 60c, roughly 2c per unit off the net. Items you hold none of pay
+nothing, and non-stackables like BoE greens count as one stack each: 30c of
+postage per item. The fee shapes the verdict and the Baganator junk flags
+like any other cost, and the Shift-held calculation line names it with the
+per-unit share and the flat total.
+
 **Undercut scam guard.** Bots briefly list a single unit at a crash price to
 bait auto-matching tools, then buy it back - which makes the stored "current
 minimum" nosedive for a few seconds. Auctionator's public API only exposes
@@ -113,6 +128,8 @@ All tunables live at the top of `NotWorthIt.lua`.
 | `NWC_SCAM_GUARD` | `true` | Ignore single bait listings: when the current price collapses far below the recent market, the verdict uses the typical price instead. |
 | `NWC_SCAM_DAYS` | `7` | Days of price history used to build the typical-price baseline. |
 | `NWC_SCAM_RATIO` | `0.5` | A current price below this fraction of the baseline counts as bait. |
+| `NWC_BANK_ALT_MODE` | `false` | Mailing loot to a bank alt to auction costs a fee per item stack (see `NWC_MAIL_COST_PER_STACK`), which quickly eats into small profits. When true, the auction net also pays a per-unit share of that fee: the item's total quantity in your bags, restacked into full stacks, times the fee, spread across those units. |
+| `NWC_MAIL_COST_PER_STACK` | `30` | The per-stack mail fee charged by `NWC_BANK_ALT_MODE`, in copper. |
 | `NWC_JUNK_POOR_QUALITY` | `true` | Grey (poor quality) items with a vendor price are always junk: they cannot be auctioned, so the vendor is their only buyer. |
 | `NWC_JUNK_IGNORE_CONSUMABLES` | `true` | Never label useful consumables (food, potions, bandages) as junk, even when the vendor pays more. |
 | `NWC_JUNK_CONSUMABLE_LEVELS` | `15` | How far below your level a consumable's required level may be while still counting as useful for the guard above. Consumable tiers are spaced 10 levels apart, so 15 protects the current tier plus one back while levelling, and survives the level cap (a 10-level band would misclassify requirement-45 endgame consumables at 60). Older consumables are left to Dejunk's rules and the vendor-versus-auction verdict. Consumables with no required level always count as useful. |
@@ -179,8 +196,8 @@ houses charge more, and the exact path handles those automatically.
   API. Retail support is not yet implemented (see Roadmap).
 - Price freshness follows Auctionator's day-bucket storage, so the freshness
   setting works in whole days, not minutes.
-- Nothing is saved to disk; the deposit cache lives for the current session
-  only.
+- Nothing is saved to disk; the deposit and bag-count caches live for the
+  current session only.
 - The green line's strikethrough is a hand-positioned texture, because
   Blizzard's text rendering has no native strikethrough. It hides whenever
   the tooltip is rebuilt and redraws on the next refresh.

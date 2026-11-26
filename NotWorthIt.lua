@@ -8,6 +8,7 @@
 -- Per item unit, the comparison is:
 --
 --   auction net = AH price * (1 - NWC_AUCTION_CUT) - deposit per unit
+--                 - mail fee per unit (NWC_BANK_ALT_MODE only)
 --   vendor bar  = vendor sell price * NWC_THRESHOLD
 --
 -- When a fresh auction price exists and the auction net lands below the
@@ -56,6 +57,16 @@ local NWC_SCAM_DAYS = 7
 -- A current price below this fraction of the baseline counts as bait.
 local NWC_SCAM_RATIO = 0.5
 
+-- Mailing loot to a bank alt to auction costs a fee per item stack
+-- (Forever charges 30c), which quickly eats into small profits. When true,
+-- the auction net also pays a per-unit share of that fee: the item's total
+-- quantity in your bags, restacked into full stacks, times the fee, spread
+-- across those units. Disable with false.
+local NWC_BANK_ALT_MODE = true
+
+-- The per-stack mail fee charged by NWC_BANK_ALT_MODE, in copper.
+local NWC_MAIL_COST_PER_STACK = 30
+
 -- Baganator runs one junk detector at a time, so while NotWorthIt is the
 -- selected detector it also covers what would otherwise come from Dejunk.
 -- Poor quality (grey) items with a vendor price are always junk: they
@@ -86,7 +97,7 @@ local NWC_JUNK_USE_DEJUNK = true
 
 -- Print one chat line per hovered item explaining its verdict. Off by
 -- default; flip to true while tuning or diagnosing.
-local NWC_DEBUG = false
+local NWC_DEBUG = true
 
 --------------------------------------------------------------------------
 -- Derived constants
@@ -140,6 +151,14 @@ local WORTH_IT_TEXT = "|cffff4c40Not|r|cff4cff40WorthIt|r"
 -- Measured with one stack size; other stack sizes round slightly
 -- differently, which is close enough for a warning.
 local depositCache = {}
+
+-- itemID -> total quantity across the player's inventory bags, feeding the
+-- bank-alt mail fee; and itemID -> the largest single-slot stack observed
+-- for it, which floors the stack size when the client's item data lags the
+-- server's. Both cleared on BAG_UPDATE and rebuilt lazily on the next read,
+-- so a burst of bag changes costs one scan. Nil until first used.
+local bagCounts = nil
+local bagStackMax = nil
 
 -- True while an auction house session is open; exact deposits are only
 -- available during that window.
@@ -314,6 +333,85 @@ local function GetDepositPerUnit(itemID, itemLink, bagID, slotID)
   return math.ceil(sellPrice * depositRate)
 end
 
+-- Total quantity of one item across the player's inventory bags (backpack
+-- plus every regular bag), plus the largest single-slot stack observed for
+-- it. The bank-alt mail fee depends on how many stacks the whole stash
+-- fills, not the one stack under the cursor. The scan touches every bag
+-- slot, so the results are cached for the session and dropped on
+-- BAG_UPDATE; bag IDs without slots are skipped, and an unavailable
+-- container API simply reports nothing.
+local function GetBagCount(itemID)
+  if bagCounts == nil then
+    local counts = {}
+    local stackMax = {}
+    if C_Container ~= nil and C_Container.GetContainerNumSlots ~= nil
+        and C_Container.GetContainerItemInfo ~= nil then
+      pcall(function()
+        for bagID = 0, NUM_BAG_FRAMES or 4 do
+          local slots = C_Container.GetContainerNumSlots(bagID) or 0
+          for slotID = 1, slots do
+            local info = C_Container.GetContainerItemInfo(bagID, slotID)
+            local id = info and info.itemID
+            if id ~= nil then
+              local count = info.stackCount or 0
+              counts[id] = (counts[id] or 0) + count
+              if count > (stackMax[id] or 0) then
+                stackMax[id] = count
+              end
+            end
+          end
+        end
+      end)
+    end
+    bagCounts = counts
+    bagStackMax = stackMax
+  end
+  return bagCounts[itemID] or 0, bagStackMax[itemID] or 0
+end
+
+-- Per-unit share of the bank-alt mail fee. Mailing the stash to a bank alt
+-- costs one fee per stack the item fills once restacked, and that flat
+-- total is spread across every unit held. Returns the per-unit share, the
+-- flat total, and the unit count it was spread across - zeros when the
+-- mode is off or the item is not in the bags (nothing to mail). The stack
+-- size comes from the client's item data, floored by the largest stack
+-- observed in the bags: on a private server the client's data can lag the
+-- server's (a slot can visibly hold more than GetItemInfo reports), and a
+-- server-packed slot is the server's true stack size. When neither source
+-- says anything usable, fall back to one stack per unit - the conservative
+-- maximum - which also keeps the division below safe.
+local function GetMailFeePerUnit(itemID, itemInfo, dbg)
+  if not NWC_BANK_ALT_MODE then
+    return 0, 0, 0
+  end
+
+  local total, largestStack = GetBagCount(itemID)
+  if total <= 0 then
+    return 0, 0, 0
+  end
+
+  local stackSize = itemInfo[8]
+  if type(stackSize) ~= "number" or stackSize < 1 then
+    stackSize = 0
+  end
+  if largestStack > stackSize then
+    stackSize = largestStack
+  end
+  if stackSize < 1 then
+    stackSize = 1
+  end
+
+  local stacks = math.ceil(total / stackSize)
+  local totalFee = stacks * NWC_MAIL_COST_PER_STACK
+  if dbg then
+    dbg(string.format(
+      "bank alt mail fee: %d in bags, %d stack(s) of %d = %s total, %s per unit",
+      total, stacks, stackSize,
+      MoneyString(totalFee), MoneyString(totalFee / total)))
+  end
+  return totalFee / total, totalFee, total
+end
+
 -- Decide whether one item is worth more to a vendor than on the auction
 -- house. Returns nil when nothing can be said (no data, stale price,
 -- unsellable item), otherwise a table with the comparison numbers.
@@ -416,7 +514,8 @@ local function GetVerdict(itemID, itemLink, bagID, slotID, dbg)
   end
 
   local depositPerUnit = GetDepositPerUnit(itemID, itemLink, bagID, slotID)
-  local net = price * (1 - NWC_AUCTION_CUT) - depositPerUnit
+  local mailFeePerUnit, mailFeeTotal, mailCount = GetMailFeePerUnit(itemID, itemInfo, dbg)
+  local net = price * (1 - NWC_AUCTION_CUT) - depositPerUnit - mailFeePerUnit
   -- The hurdle the auction net must clear: the vendor price raised by the
   -- threshold factor. The Shift-held calculation line spells this
   -- comparison out; the debug lines use the numbers directly.
@@ -431,6 +530,9 @@ local function GetVerdict(itemID, itemLink, bagID, slotID, dbg)
     net = net,
     price = price,
     deposit = depositPerUnit,
+    mail = mailFeePerUnit,
+    mailTotal = mailFeeTotal,
+    mailCount = mailCount,
   }
 end
 
@@ -525,7 +627,9 @@ end
 -- Shift is held: the auction net, the same margin figure the verdict line
 -- above shows, the vendor price it is measured against, and in
 -- parentheses the vendor bar that price becomes under the threshold -
--- the hurdle the flagged line fell short of.
+-- the hurdle the flagged line fell short of. When the bank-alt mail fee
+-- touched the net, it is named right after it: the per-unit share, with
+-- the flat stash total and unit count in parentheses.
 local function AddCalculationLine(tooltip, verdict)
   if not IsShiftKeyDown() then
     return
@@ -533,9 +637,14 @@ local function AddCalculationLine(tooltip, verdict)
   local gap = verdict.notWorthIt
     and verdict.vendorBar - verdict.net
     or verdict.net - verdict.vendor
+  local mailNote = ""
+  if (verdict.mail or 0) > 0 then
+    mailNote = string.format(" incl. %s mail (%s across %d)",
+      MoneyString(verdict.mail), MoneyString(verdict.mailTotal), verdict.mailCount)
+  end
   tooltip:AddLine(string.format(
-    "AH %s is %s %s vendor %s at %d%% threshold (%s).",
-    MoneyString(verdict.net),
+    "AH %s%s is %s %s vendor %s at %d%% threshold (%s).",
+    MoneyString(verdict.net), mailNote,
     MoneyString(gap),
     verdict.notWorthIt and "below" or "above",
     MoneyString(verdict.vendor),
@@ -825,6 +934,11 @@ eventFrame:RegisterEvent("ADDON_LOADED")
 eventFrame:RegisterEvent("AUCTION_HOUSE_SHOW")
 eventFrame:RegisterEvent("AUCTION_HOUSE_CLOSED")
 eventFrame:RegisterEvent("MODIFIER_STATE_CHANGED")
+-- Only bank alt mode reads bag contents; the default build registers
+-- nothing here and behaves exactly as before.
+if NWC_BANK_ALT_MODE then
+  eventFrame:RegisterEvent("BAG_UPDATE")
+end
 eventFrame:SetScript("OnEvent", function(_, event, arg1)
   if event == "ADDON_LOADED" then
     -- Auctionator, Baganator and Dejunk are listed in OptionalDeps and
@@ -842,6 +956,9 @@ eventFrame:SetScript("OnEvent", function(_, event, arg1)
     ahOpen = true
   elseif event == "AUCTION_HOUSE_CLOSED" then
     ahOpen = false
+  elseif event == "BAG_UPDATE" then
+    bagCounts = nil -- both bag caches rebuilt on the next mail-fee read
+    bagStackMax = nil
   elseif event == "MODIFIER_STATE_CHANGED" then
     -- Only Shift matters; other modifiers leave the tooltip unchanged.
     if arg1 == "LSHIFT" or arg1 == "RSHIFT" then
