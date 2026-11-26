@@ -14,6 +14,7 @@ judges items, edit the tunables at the top of `NotWorthIt.lua` and reload.
 - [Integrations](#integrations)
 - [Notes and limits](#notes-and-limits)
 - [Roadmap](#roadmap)
+- [AI Advisory / Warranty](#ai-advisory--warranty)
 
 ## What it does
 
@@ -212,3 +213,21 @@ houses charge more, and the exact path handles those automatically.
   expected work is small: a multi-version `## Interface` line, plus
   recalibrating the deposit and auction-duration tunables, which currently
   encode Forever's auction rules and are untested on retail.
+
+## AI Advisory / Warranty
+
+While a human is responsible for the design, overall architecture, and testing
+of this project, AI was used to produce the codebase.
+
+This project is a hobby addon offered as-is, with no warranty of any kind: use
+it at your own risk. The whole addon is one short Lua file, so read it before
+you trust it. It can be wrong - prices come from Auctionator's database and
+can be stale or manipulated, and deposits and mail fees are estimates - but
+the most a wrong verdict can cost is coin: the addon never posts, cancels, or
+sells anything, so it cannot lose you an item, only leave some value on the
+table. Hold Shift and read the numbers before acting on anything that
+matters.
+
+This project is unofficial and not affiliated with or endorsed by Blizzard
+Entertainment. It is not financial advice, whatever that would mean for a
+stack of Light Leather.
