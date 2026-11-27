@@ -8,6 +8,14 @@
 - [Version 1.0.1](#version-101---2026-11-25)
 - [Version 1.0.0](#version-100---2026-11-25)
 
+## Recent Changes
+
+### Changed
+
+- The already-soulbound BoE/BoU state check is written into `GetVerdict`
+  but commented out pending in-game testing (see README TODO); behaviour
+  is unchanged until it is verified and re-enabled.
+
 ## Version 1.3.0 - 2026-11-26
 
 ### Added - 1.3.0

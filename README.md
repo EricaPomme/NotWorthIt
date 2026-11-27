@@ -14,7 +14,7 @@ judges items, edit the tunables at the top of `NotWorthIt.lua` and reload.
 - [Tunables](#tunables)
 - [Integrations](#integrations)
 - [Notes and limits](#notes-and-limits)
-- [Roadmap](#roadmap)
+- [TODO](#todo)
 - [Packaging](#packaging)
 - [AI Advisory / Warranty](#ai-advisory--warranty)
 
@@ -196,7 +196,7 @@ houses charge more, and the exact path handles those automatically.
 ## Notes and limits
 
 - Built for WoW Forever only (`## Interface: 16001`), on its modern-era addon
-  API. Retail support is not yet implemented (see Roadmap).
+  API. Retail support is not yet implemented (see TODO).
 - Price freshness follows Auctionator's day-bucket storage, so the freshness
   setting works in whole days, not minutes.
 - Nothing is saved to disk; the deposit and bag-count caches live for the
@@ -207,7 +207,12 @@ houses charge more, and the exact path handles those automatically.
 - The addon never posts, cancels, or sells anything. It only reads data and
   writes tooltip text and Baganator's junk flags.
 
-## Roadmap
+## TODO
+
+- In-game testing for the disabled soulbound-state check (`GetVerdict`, the
+  commented block): hover both a soulbound and an unbound copy of the same
+  Bind-on-Equip/Bind-on-Use item, confirm the soulbound copy gets no verdict
+  and the unbound one still does, then uncomment the block.
 
 - Retail (12.x) support - not yet implemented. The addon is already written
   against the retail-era addon APIs, and the integrations (Auctionator,

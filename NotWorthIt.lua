@@ -439,6 +439,22 @@ local function GetVerdict(itemID, itemLink, bagID, slotID, dbg)
     return nil
   end
 
+  -- DISABLED pending in-game testing (see README TODO): a BoE/BoU copy
+  -- the player has already used or equipped still reports an unbound bind
+  -- type above, so this would ask the bag slot itself. Missing bag
+  -- coordinates or a missing API silently skip the check. Uncomment to
+  -- re-enable.
+  --[[
+  if bagID ~= nil and slotID ~= nil
+      and C_Item.IsBound and ItemLocation and ItemLocation.CreateFromBagAndSlot then
+    local ok, bound = pcall(C_Item.IsBound, ItemLocation:CreateFromBagAndSlot(bagID, slotID))
+    if ok and bound then
+      if dbg then dbg("this copy is already soulbound") end
+      return nil
+    end
+  end
+  ]]
+
   local sellPrice = itemInfo[11]
   if sellPrice == nil or sellPrice <= 0 then
     if dbg then dbg("vendor pays nothing") end
